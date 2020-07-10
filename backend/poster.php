@@ -50,8 +50,8 @@ foreach($rows as $k => $row){
     下一筆$k+1 + 是否最後一筆 $k == count($rows)-1
 
     -->
-    <button data-rank="<?=$row['id']."-".$prev;?>">往上</button>
-    <button data-rank="<?=$row['id']."-".$next;?>">往下</button>
+    <button type="button" data-rank="<?=$row['id']."-".$prev;?>">往上</button>
+    <button type="button" data-rank="<?=$row['id']."-".$next;?>">往下</button>
 </div>
 <div>
     <input type="checkbox" name="sh[]" value="<?=$row['id'];?>" <?=$isChecked;?>>顯示 
@@ -94,3 +94,16 @@ foreach($rows as $k => $row){
     <div class="ct"><input type="submit" value="新增"><input type="reset" value="重置"></div>
 </form>
 </div>
+
+<script>
+
+$("button").on("click",function(){
+    let id=$(this).data("rank").split("-");
+    $.post("api/rank.php",{id,"table":"poster"},function(){
+        location.reload();
+    })
+})
+
+
+
+</script>
