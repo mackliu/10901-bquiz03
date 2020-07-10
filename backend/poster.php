@@ -34,16 +34,24 @@ h4{
 
 <?php
 $db=new DB("poster");
-$rows=$db->all();
-foreach($rows as $row){
+$rows=$db->all([]," order by `rank`");
+foreach($rows as $k => $row){
     $isChecked=($row['sh']==1)?"checked":"";
+    $prev=($k!=0)?$rows[$k-1]['id']:$row['id'];
+    $next=($k!=(count($rows)-1))?$rows[$k+1]['id']:$row['id'];
+
 ?>
 <div class="row">
 <div><img src="img/<?=$row['path'];?>" style="width:90px;"> </div>
 <div><input type="text" name="name[]" value="<?=$row['name'];?>"> </div>
 <div>
-    <button>往上</button>
-    <button>往下</button>
+    <!--
+    上一筆$k-1 + 是否第一筆 $k == 0
+    下一筆$k+1 + 是否最後一筆 $k == count($rows)-1
+
+    -->
+    <button data-rank="<?=$row['id']."-".$prev;?>">往上</button>
+    <button data-rank="<?=$row['id']."-".$next;?>">往下</button>
 </div>
 <div>
     <input type="checkbox" name="sh[]" value="<?=$row['id'];?>" <?=$isChecked;?>>顯示 
