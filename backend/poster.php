@@ -29,6 +29,7 @@ h4{
     <div>預告片排序</div>
     <div>操作</div>
 </div>
+<form action="api/edit_poster.php" method="post">
 <div style="overflow:auto;height:250px" >
 
 <?php
@@ -39,7 +40,7 @@ foreach($rows as $row){
 ?>
 <div class="row">
 <div><img src="img/<?=$row['path'];?>" style="width:90px;"> </div>
-<div><input type="text" name="name" value="<?=$row['name'];?>"> </div>
+<div><input type="text" name="name[]" value="<?=$row['name'];?>"> </div>
 <div>
     <button>往上</button>
     <button>往下</button>
@@ -47,11 +48,12 @@ foreach($rows as $row){
 <div>
     <input type="checkbox" name="sh[]" value="<?=$row['id'];?>" <?=$isChecked;?>>顯示 
     <input type="checkbox" name="del[]" value="<?=$row['id'];?>">刪除
-    <select name="ani">
+    <select name="ani[]">
         <option value="1" <?=($row['ani']==1)?"selected":"";?>>淡入淡出</option>
         <option value="2" <?=($row['ani']==2)?"selected":"";?>>放大縮小</option>
         <option value="3" <?=($row['ani']==3)?"selected":"";?>>滑入滑出</option>
     </select>
+    <input type="hidden" name="id[]" value="<?=$row['id'];?>">
 </div>
 </div>
 <?php
@@ -60,10 +62,12 @@ foreach($rows as $row){
 ?>
 
 </div>
+
 <div class="ct">
     <input type="submit" value="編輯確定">
     <input type="reset" value="重置">
 </div>
+</form>
 </div>
 <hr>
 <div style="width:98%;margin:auto;height:150px">
