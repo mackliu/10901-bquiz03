@@ -28,6 +28,8 @@
 
 <?php
 $po=new DB("poster");
+
+//取出設定為顯示並排序過的資料
 $rows=$po->all(['sh'=>1]," order by `rank`");
 
 
