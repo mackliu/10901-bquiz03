@@ -178,16 +178,63 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
       
       </script>
       
-
+<style>
+  .mb{
+    width:48%;
+    height:160px;
+    margin:0.5%;
+    display:inline-block;
+  }
+</style>
   <!---院線片-->  
     <div class="half">
       <h1>院線片清單</h1>
       <div class="rb tab" style="width:95%;">
-        <table>
-          <tbody>
-            <tr> </tr>
-          </tbody>
-        </table>
-        <div class="ct"> </div>
+      <?php
+        
+        $db=new DB("movie");
+        $today=date("Y-m-d");
+        $ondate=date("Y-m-d",strtotime("-2 days"));
+
+        $total=$db->count(['sh'=>1]," && ondate >= '$ondate' && ondate <='$today'");
+        $div=4;
+        $pages=ceil($total/$div);
+        $now=(!empty($_GET['p']))?$_GET['p']:1;
+        $start=($now-1)*$div;
+        $rows=$db->all(['sh'=>1]," && ondate >= '$ondate' && ondate <='$today' order by rank limit $start,$div");
+        
+        foreach($rows as $row){
+      ?>
+      <div class="mb">
+          <table>
+            <tr>
+              <td rowspan="3"><a href="?do=intro&id=<?=$row['id'];?>"><img src="img/<?=$row['poster'];?>" style="width:80px;height:100px;"></a></td>
+              <td><?=$row['name'];?></td>
+            </tr>
+            <tr>
+              <td><img src="icon/<?=$row['level'];?>.png" style="width:15px"><?=$level[$row['level']];?></td>
+            </tr>
+            <tr>
+              <td><?=$row['ondate'];?></td>
+            </tr>
+          </table>
+          <div class="ct">
+            <button>劇情簡介</button><button>線上訂票</button>
+          </div>
+
+      </div>
+      <?php
+      }
+      ?>
+      <div class="ct">
+      <?php
+
+        for($i=1;$i<=$pages;$i++){
+            $font=($i==$now)?'24px':'18px';
+          echo "<a href='?p=$i' style='font-size:$font;text-decoration:none'> $i </a>";
+        }
+      
+      ?>
+    </div>
       </div>
     </div>
