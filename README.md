@@ -36,7 +36,7 @@
 ```php
 //另一個做法參考，省略home.php
   $do=(!empty($_GET['do']))?$_GET['do']:"";
-  $path="./admin/".$do.".php";
+  $path="./backend/".$do.".php";
   if(file_exists($path)){
     include $path;
   }else{
@@ -172,7 +172,7 @@ function to($url){
     |  name  |  type   |  pk   | default |  A_I  |   note   |
     | :----: | :-----: | :---: | :-----: | :---: | :------: |
     |   id   | int(10) |  yes  |         |  yes  |  流水號  |
-    | poster |  text   |       |         |       | 檔案路徑 |
+    |  path  |  text   |       |         |       | 檔案路徑 |
     |  name  |  text   |       |         |       |   片名   |
     |  rank  | int(5)  |       |         |       |   排序   |
     |   sh   | int(1)  |       |    1    |       |   顯示   |
@@ -206,14 +206,14 @@ function to($url){
 
 最後，示意圖中給出的排序方式是採用按鈕往上或往下來改變順序，但依照題意只要可以設定排序都可以，因此這邊的做法也可以採用直接填入數值的方式來達到排序的目的，我這邊使用的是ajax的方式以按鈕動作來改變排序。
 
-1. 在 `./admin/` 中建立 `poster.php` 
+1. 在 `./backend/` 中建立 `poster.php` 
 2. 撰寫**新增預告片海報**的表單。
 3. 在 `./api/` 目錄中建立 `add_poster.php`，並撰寫新增預告片寫入資料表的相關程式
 4. 撰寫**預告片清單**中的表單格式及區塊配置
-5. 在 `./admin/` 中建立 `poster_list.php` ，這個檔案的用途是做為海報列表之用，並透過Ajax的方式被引入到 `poster.php`
-6. 在 `poster_list.php` 中撰寫預告片海報列表的程式碼，由於會使用到排序的功能，因此要注意在取出資料時，要下 ` order by rank`的指令，才會依照rank欄位值來排序。
-7. 在 `poster.php` 中增加javascript 程式來載入 `poster_list.php` 的內容
-8. 建立 `./api/edit_poster.php` 檔案並撰寫海報的編輯片名/顯示/刪除/動畫等功能
+5. 在 `poster.php` 中撰寫預告片海報列表的程式碼，由於會使用到排序的功能，因此要注意在取出資料時，要下 ` order by rank`的指令，才會依照rank欄位值來排序(ASC 或 DESC都可以)。
+6. 建立 `./api/edit_poster.php` 檔案並撰寫海報的編輯片名/顯示/刪除/動畫等功能
+7. 往上/往下的功能有兩種做法，一種是透過ajax來傳送要交換的資料id，讓後台去更新rank，一種是提供輸入框讓使用者自行輸入rank值，兩種做法都可以達成排序的目的。
+
 
 ---
 
@@ -222,11 +222,52 @@ function to($url){
 
 不管採用那個做法，後面在院線片管理中也會使用到改變順序的功能，因此只要做一次就可以複製給另一個功能來使用。
 
-1. 在 `./admin/posterlist.php` 中的按鈕標籤中增加資料的id值，這裹我們利用foreach迴圈的特性，同時計算出上一筆及下一筆的id值，然後帶入按鈕屬性中的id值。
-2. 在 `./admin/poster.php` 中原本的 `getList()` 函式中建立載入 `posterlist.php` 後的按鈕點擊事件，並取得要交換的兩筆資料id，送到後台api去做順序對調的動作
-3. 在 `./api/switch.php` 中撰寫交換資料排序的php程式碼
+1. 在 `./backend/poster.php` 中的按鈕標籤中增加資料的id值，這裏我們利用foreach迴圈的特性，同時計算出上一筆及下一筆的id值，然後帶入按鈕屬性中的id值。
+
+```php
+    $prev=($k!=0)?$rows[$k-1]['id']:$row['id'];
+    $next=($k!=(count($rows)-1))?$rows[$k+1]['id']:$row['id'];
+```
+```php
+  <!--如果要使用button 標籤，記得加上type=button的屬性，否則會預設為submit來使用-->
+    <button type="button" data-rank="<?=$row['id']."-".$prev;?>">往上</button>
+    <button type="button" data-rank="<?=$row['id']."-".$next;?>">往下</button>
+
+```
+2. 在 `./backend/poster.php` 中撰寫按鈕事件來取得要交換的id值，並以ajax的方式來傳送到後台進行更新。
+
+```javascript
+$("button").on("click",function(){
+    let id=$(this).data("rank").split("-");
+    $.post("api/rank.php",{id,"table":"poster"},function(){
+        location.reload();
+    })
+})
+
+```
+
+3. 在 `./api/rank.php` 中撰寫交換資料排序的php程式碼
+
+```php
+include_once "../base.php";
+
+$table=$_POST['table'];
+$db=new DB($table);
+
+$row1=$db->find($_POST['id'][0]);
+$row2=$db->find($_POST['id'][1]);
+
+
+$tmp=$row1;
+$row1['rank']=$row2['rank'];
+$row2['rank']=$tmp['rank'];
+
+$db->save($row1);
+$db->save($row2);
+
+```
 4. 由於排序的交換功能在院線片中也會使用到，因此我們在設計api時增加了對資料表的判斷，做到可以相容各資料表
-5. 在ajax傳送完資料後，會重新載入 `posterlist.php` 這時會產生新的排序後的列表。
+5. 在ajax傳送完資料後，重新載入整個頁面這時會產生新的排序後的列表。
 
 ---
 
@@ -237,7 +278,7 @@ function to($url){
   3. 最後是新增/編輯院線片的功能；
 
 之所以會這樣安排是因為新增/編輯的表單欄位較多又有上傳檔案的功能，會花比較多時間來製作，加上分數只有十分，所以我個人都會先跳過這兩個小功能，先把佔分比較多且製作可以較快速的列表及按鈕功能做完再回頭來補，這樣的解題策略因人而異，同學們可以自行安排。
-1. 在 `./admin/` 目錄中新增 `movie.php` 檔案，這是院線片管理的主要頁面。
+1. 在 `./backend/` 目錄中新增 `movie.php` 檔案，這是院線片管理的主要頁面。
 2. 由於題目沒有提供院線片的文字素材，因此我們可以先建立一個 `tmp.php` 自行寫一支小程式來快速建立需要的資料內容，執行完畢後資料表就會產生一堆院線片的資料，之後這個 `tmp.php` 檔可以刪除；除了寫程式的方式，也可以直接利用phpmyadmin來新增及複製數筆資料。
 
 ```php
@@ -261,9 +302,9 @@ for($i=1;$i<=10;$i++){
 
 ```
 
-3. 透過2.的資料新增，我們不用先做新增院線片的功能也可以建置資料，因此接下來我們在 `./admin/movie.php` 中撰寫院線片管理需要的頁面html碼
-4. 在 `./admin/` 目錄中新增 `movielist.php` 檔案，作用和 `posterlist.php` 一樣，是用來以ajax載入列表之用。
-5. 在 `./admin/movielist.php` 撰寫電影列表的相關程式碼。
+3. 透過2.的資料新增，我們不用先做新增院線片的功能也可以建置資料，因此接下來我們在 `./backend/movie.php` 中撰寫院線片管理需要的頁面html碼
+4. 在 `./backend/` 目錄中新增 `movielist.php` 檔案，作用和 `posterlist.php` 一樣，是用來以ajax載入列表之用。
+5. 在 `./backend/movielist.php` 撰寫電影列表的相關程式碼。
 6. 在 `base.php` 中增加一個分級的陣列，這個陣列以我們在資料庫中設定的分級種類做為key值，而內容則以子陣列的方式存入分級圖檔的檔名及字串，加在 `base.php` 中的原因是要這個變數成為所有頁面都可以存取的變數
 
 ```php
@@ -300,12 +341,12 @@ input[type='button'],input[type='submit'],input[type='reset'],button,.button
 ## 步驟十：後台院線片管理二
 完成列表功能後，接下來製作各個按鈕的功能，示意圖中不像預告片那邊有一個確認編輯的按鈕，因此我們可以理解為每部院線片的設定都是獨立的，但是題目本身並沒有指定到底要怎麼做，因此延用預告片的做法也是可以的，我在這邊使用的是接近示意圖的做法，也就是儘可能使用ajax來完成所有按鈕功能的操作，每一次的操作也只針對一筆資料來處理。
 
-1. **顯示**按鈕的功能，需要告知api是那張表格的那筆資料要改為隱藏，因此我們在 `./admin/movielist.php` 的顯示按鈕中增加一個**data-show**屬性並帶入資料的id值
-2. 在 `./admin/movie.php` 中撰寫javascript程式嗎，處理顯示按鈕的功能
+1. **顯示**按鈕的功能，需要告知api是那張表格的那筆資料要改為隱藏，因此我們在 `./backend/movielist.php` 的顯示按鈕中增加一個**data-show**屬性並帶入資料的id值
+2. 在 `./backend/movie.php` 中撰寫javascript程式嗎，處理顯示按鈕的功能
 3. 建立 `./api/sh.php` 並撰寫更改顯示值的語法
-4. **往上**、**往下**按鈕的功能，複製 `./admin/poster.php` 中的排序按鈕js，並修改相應的資料表名，即可完成排序的功能，要記得在 `./admin/movielist.php` 中增加排序的sql語法，api還是使用 `./api/switch.php` ，只要記得帶上table名就可以了
-5. **刪除**按鈕的功能，在 `./admin/movielist.php` 的刪除按鈕上增加**data-del**屬性並帶入資料的id值
-6. 在 `./admin/movie.php` 中增加刪除功能的事件註冊及相應的行為
+4. **往上**、**往下**按鈕的功能，複製 `./backend/poster.php` 中的排序按鈕js，並修改相應的資料表名，即可完成排序的功能，要記得在 `./backend/movielist.php` 中增加排序的sql語法，api還是使用 `./api/switch.php` ，只要記得帶上table名就可以了
+5. **刪除**按鈕的功能，在 `./backend/movielist.php` 的刪除按鈕上增加**data-del**屬性並帶入資料的id值
+6. 在 `./backend/movie.php` 中增加刪除功能的事件註冊及相應的行為
 7. 新增 `./api/del.php` ，並撰寫刪除功能的程式碼
 
 ---
@@ -313,12 +354,12 @@ input[type='button'],input[type='submit'],input[type='reset'],button,.button
 ## 步驟十一：後台院線片管理三-新增/編輯院線片
 示意圖給出的表單範例做起來有點囉嗦，所以這邊建議先把功能完成，回頭有空再來處理視覺的問題，而且因為這兩個功能加起來只有10分，如果不能在15分鐘內完成的話，實在不值得花太多時間在這裹，我這邊使用的做法先不管美觀和排版，先以縮短這兩個小項目的製作時間為主，如果沒有把握可以把兩個項目快速做完，會建議先去處理其它的功能再回頭來補完這兩個項目。
 
-1. 在 `./admin/` 目錄下新增 `addmovie.php` 檔案，並撰寫需要的表單內容，示意圖中左側的"影片資料"及"劇情簡介"兩個字串並不是必須的，排列方式以簡單快速為主，這邊我使用 `ul` 清單加上emmet語法來列出所有的表單項目，再加上簡單的css控制一下外觀。
+1. 在 `./backend/` 目錄下新增 `addmovie.php` 檔案，並撰寫需要的表單內容，示意圖中左側的"影片資料"及"劇情簡介"兩個字串並不是必須的，排列方式以簡單快速為主，這邊我使用 `ul` 清單加上emmet語法來列出所有的表單項目，再加上簡單的css控制一下外觀。
 2. 在 `./api/` 目錄下新增 `editmovie.php` 檔案，並撰寫需要的PHP程式碼，這邊我們增加對id的判斷來讓這個程式可以同時處理新增及編輯功能。
 3. 依題意最麻煩的是上映日期規定要使用三個下拉選單，但資料表中只有一個**ondate**欄位，因此要在api中將這三個欄位組合成日期格式後才能存入資料表。
 4. 由於表單提供使用者可以上傳海報及影片，所以要記得做兩個判斷式來處理檔案上傳的動作
 5. 另外要記得處理排序欄位及顯示欄位，排序欄位的值我們以sql語法直接向資料尋找id的最大值再加1來當成rank欄位的值
-6. 複製 `./admin/addmovie.php` 成為 `./admin/editmovie.php` ，並加入取得資料及在各欄位寫入欄位值。
+6. 複製 `./backend/addmovie.php` 成為 `./backend/editmovie.php` ，並加入取得資料及在各欄位寫入欄位值。
 
 ---
 
@@ -486,11 +527,11 @@ date_default_timezone_set("Asia/Taipei");
 ## 步驟十六：後台電影票訂單管理
 訂單管理功能也算是相對簡單的功能，如果不想等做完訂票功能才來做後台訂單管理的話，可以參考院線的做法，先利用程式的方式來產生數筆訂單資料，這樣就可以先來完成訂單管理功能了。
 
-1. 在 `./admin/` 目錄中新增 `order.php` 檔案，並撰寫訂單管理功能需要的基本版面內容
-2. 在 `./admin/` 目錄中新增 `orderlist.php` 檔案，並撰寫訂單列表的功能
-3. 在 `./admin/order.php` 中撰寫js函式 `getList()` 用來做為ajax載入列表的函式，也可以直接從 `poster.php` 或 `movie.php` 複製過來修改
-4. 在 `./admin/order.php` 中的 `getList()` 建立刪除按鈕的點擊事件，並利用先前寫過的 `./api/del.php` 來完成刪除單筆訂單的功能，刪除單筆訂單的功能並沒有提到需要做確認的動作，因此是否要做確認可自行決定。
-5. 在 `./admin/order.php` 中建立 `qDel()` 函式，並撰寫相關的取值及確認動作
+1. 在 `./backend/` 目錄中新增 `order.php` 檔案，並撰寫訂單管理功能需要的基本版面內容
+2. 在 `./backend/` 目錄中新增 `orderlist.php` 檔案，並撰寫訂單列表的功能
+3. 在 `./backend/order.php` 中撰寫js函式 `getList()` 用來做為ajax載入列表的函式，也可以直接從 `poster.php` 或 `movie.php` 複製過來修改
+4. 在 `./backend/order.php` 中的 `getList()` 建立刪除按鈕的點擊事件，並利用先前寫過的 `./api/del.php` 來完成刪除單筆訂單的功能，刪除單筆訂單的功能並沒有提到需要做確認的動作，因此是否要做確認可自行決定。
+5. 在 `./backend/order.php` 中建立 `qDel()` 函式，並撰寫相關的取值及確認動作
 6. 在 `./api/` 目錄中建立 `qDel.php` 檔案，依照前端傳過來的條件刪除資料
 
 ---
