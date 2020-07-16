@@ -25,7 +25,25 @@
   text-align:center;
   cursor:pointer;
 }
-
+.poster{
+    border: 1px solid;
+    width: 200px;
+    height: 260px;
+    margin: 0 auto 20px auto;
+    position:relative;
+    
+}
+.po{
+width:100%;
+height:100%;
+background:white;
+color:black;
+position:absolute;
+display:none;
+}
+.po img{
+  width:100%;
+}
 </style>
 
 <?php
@@ -39,9 +57,20 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
 <div class="half" style="vertical-align:top;">
       <h1>預告片介紹</h1>
       <div class="rb tab" style="width:95%;">
+      <!--海報區-->
         <div class="poster">
+        <?php
+          foreach($rows as $k=>$row){
+            echo "<div class='po'>";
+            echo "<img src='img/".$row['path']."'>";
+            echo "<div class='ct'>".$row['name']."</div>";
+            echo "</div>";
+          }
 
+        ?>
         </div>
+
+        <!--按鈕區-->
         <div class="btns">
           <div class='control' onclick="shift('left')">&#9664;</div>
           <div class="nav">
@@ -62,7 +91,7 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
       </div>
     </div>
       <script>
-
+      $(".po").eq(0).show();
       let p=0;
       let total=$(".icon").length;
       function shift(direct){
@@ -81,7 +110,6 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
               }
           break;
         }
-        console.log(p)
       }
       
       
