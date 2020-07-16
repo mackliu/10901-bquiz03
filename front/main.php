@@ -61,7 +61,7 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
         <div class="poster">
         <?php
           foreach($rows as $k=>$row){
-            echo "<div class='po'>";
+            echo "<div class='po' data-ani='".$row['ani']."'>";
             echo "<img src='img/".$row['path']."'>";
             echo "<div class='ct'>".$row['name']."</div>";
             echo "</div>";
@@ -92,18 +92,71 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
     </div>
       <script>
       $(".po").eq(0).show();
+
+      let auto=setInterval(slider, 3000);
+
+      function slider(){
+        let dom=$(".po:visible");
+        let ani=$(dom).data('ani');
+        let next=$(dom).next();
+        if(next.length<=0){
+          next=$(".po").eq(0)
+        }
+        
+        //console.log(next.length)
+        switch(ani){
+          case 1:
+            //淡入淡出
+              $(dom).fadeOut(1000,function(){
+                $(next).fadeIn(1000);
+              });
+            break;
+          case 2:
+            //放大縮小
+              $(dom).hide(1000,function(){
+                $(next).show(1000);
+              });
+            break;
+          case 3:
+            //滑入滑出
+              $(dom).slideUp(1000,function(){
+                $(next).slideDown(1000);
+              });
+            break;
+        }
+
+      }
+
+      $(".icon").on("click",function(){
+        
+        let index=$(".icon").index($(this))
+        $(".po").hide();
+        $(".po").eq(index).show();
+        
+      })
+
+      $(".nav").hover(
+        function(){
+          clearInterval(auto)
+        },
+        function(){
+          auto=setInterval(slider, 3000);
+        }
+
+      )
+
       let p=0;
       let total=$(".icon").length;
       function shift(direct){
         switch(direct){
-          case 'left':
+          case 'right':
             if(p<(total-4)){
               p++;
               $(".icon").animate({right:80*p});
             }
 
             break;
-          case 'right':
+          case 'left':
               if(p>0){
                 p--;
                 $(".icon").animate({right:80*p})
