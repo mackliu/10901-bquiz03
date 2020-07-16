@@ -67,6 +67,7 @@ foreach($rows as $k => $row){
         <option value="1" <?=($row['ani']==1)?"selected":"";?>>淡入淡出</option>
         <option value="2" <?=($row['ani']==2)?"selected":"";?>>放大縮小</option>
         <option value="3" <?=($row['ani']==3)?"selected":"";?>>滑入滑出</option>
+        <option value="4" <?=($row['ani']==4)?"selected":"";?>>縮放</option>
     </select>
     <input type="hidden" name="id[]" value="<?=$row['id'];?>">
 </div>
