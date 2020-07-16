@@ -219,7 +219,7 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
             </tr>
           </table>
           <div class="ct">
-            <button>劇情簡介</button><button>線上訂票</button>
+            <button onclick="location.href='?do=intro&id=<?=$row['id'];?>'">劇情簡介</button><button onclick="location.href='?do=order&id=<?=$row['id'];?>'">線上訂票</button>
           </div>
 
       </div>
