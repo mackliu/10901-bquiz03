@@ -44,13 +44,23 @@ $("#movie").on("change",function(){
     getDuration()
 })
 
+$("#date").on("change",function(){
+    getSession();
+})
 
 function getDuration(){
     let id=$("#movie").val();
     $.get("api/get_duration.php",{id},function(duration){
         $("#date").html(duration)
-    })
-    console.log(id)    
+        getSession()
+    })  
 }
 
+function getSession(){
+    let date=$("#date").val();
+    let id=$("#movie").val();
+    $.get("api/get_session.php",{date,id},function(session){
+        $("#session").html(session);
+    })
+}
 </script>
