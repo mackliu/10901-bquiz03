@@ -37,14 +37,15 @@
 </div>
 
 <script>
-
+//在頁面載入完成後先載入一次電影列表
 reloadlist();
 
+//取得電影列表的函式
 function reloadlist(){
     $.get("api/movie_list.php",function(list){
         $(".list").html(list)
         
-        //使用jquery來對button的點擊做處理
+        //使用jquery來對載入後的列表中的button進行點擊動作的處理
         $(".shift").on("click",function(){
         
         //取得data屬性的值，並拆成一個id陣列
@@ -60,20 +61,26 @@ function reloadlist(){
     })
 }
 
+//處理顯示切換的功能
 function sh(table,id){
     $.post("api/sh.php",{table,id},function(){
+        //後端的資料更新完後,重新載入一次電影列表
         reloadlist()
     })
 }
 
+//刪除資料表資料的函式
 function del(table,id){
     $.post("api/del.php",{table,id},function(){
+        //後端的資料更新完後,重新載入一次電影列表
         reloadlist()
     })
 }
 
 
-/* //使用jquery來對button的點擊做處理
+/* 這一段程式碼在電影列表改為ajax載入後，需要搬到reloadList()函式，也就是當列表的內容載入到網頁時，才能去註冊列表中的按鈕事件
+ 
+//使用jquery來對button的點擊做處理
 $(".shift").on("click",function(){
 
     //取得data屬性的值，並拆成一個id陣列

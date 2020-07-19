@@ -1,6 +1,9 @@
 <?php
 include_once "../base.php";
 
+//將原本在後台頁面直接寫入的電影列表程式碼搬到api中成為一個獨立的api，
+//藉此讓前端可以ajax的方式來呼叫電影列表
+
 $db=new DB('movie');
 $rows=$db->all([]," order by rank");
 foreach($rows as $k => $row){

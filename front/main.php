@@ -1,5 +1,6 @@
 <!---預告片-->
 <style>
+/*建立所需的CSS內容*/
 .btns{
   display:flex;
 }
@@ -91,19 +92,29 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
       </div>
     </div>
       <script>
+      //先顯示第一張預告片海報
       $(".po").eq(0).show();
 
+      //設定每三秒執行一次海報轉場的函式
       let auto=setInterval(slider, 3000);
-
+      
+      //海報轉場函式
       function slider(){
+        //先取得目前頁面上正顯示的海報
         let dom=$(".po:visible");
+
+        //取得海報的轉場樣式
         let ani=$(dom).data('ani');
+
+        //取得海報的下一張海報
         let next=$(dom).next();
+        
+        //計算是否有下一張海報，如果沒有下一張海報則使用第一張海報
         if(next.length<=0){
           next=$(".po").eq(0)
         }
         
-        //console.log(next.length)
+        //根據轉場樣式來執行轉場動畫
         switch(ani){
           case 1:
             //淡入淡出
@@ -124,7 +135,7 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
               });
             break;
           case 4:
-            //縮放
+            //縮放,使用animate()函式來執行較細緻的轉場動畫，需要注意各須參數的變化關係，及動畫的先後順序
             $(dom).animate({width:0,height:0,left:100,top:130},function(){
                 $(next).css({width:0,height:0,left:100,top:130})
                 $(next).show();
@@ -137,14 +148,19 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
 
       }
 
+      //註冊下方icon的點擊事件
+
       $(".icon").on("click",function(){
-        
+
+        //取得icon的索引值，並以此索引值來更換海報  
         let index=$(".icon").index($(this))
         $(".po").hide();
         $(".po").eq(index).show();
         
       })
 
+      //註冊滑鼠移入icon取的事件，取消interval事件，當滑鼠離開時再恢復interval事件
+      //以避免時間差的問題造成轉場動畫出錯
       $(".nav").hover(
         function(){
           clearInterval(auto)
@@ -154,9 +170,13 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
         }
 
       )
-
+      
+      //建立一個icon移動次數的變數
       let p=0;
+      //計算有幾個icon可以點擊
       let total=$(".icon").length;
+
+      //icon移動函式
       function shift(direct){
         switch(direct){
           case 'right':
