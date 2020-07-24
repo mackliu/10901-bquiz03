@@ -81,7 +81,7 @@
      <p>您已經勾選<span id='ticket'></span>張票，最多可以購買四張票</p>           
 </div>
 <button onclick="prev()">上一步</button>
-<button onclick="order()">訂購</button>
+<button id="send">訂購</button>
 </div>
 </div>
 <script>
@@ -136,9 +136,15 @@ function booking(){
                 break;
             }
             console.log(seat)
-        $("#ticket").html(ticket);
-})
-
+         $("#ticket").html(ticket);
+        })
+    
+        $("#send").on("click",function(){
+            $.post("api/order.php",{movie,date,session,seat},function(ordno){
+                
+                location.href="?do=result&ord="+ordno;
+            })
+        })
     })
 
     $(".order-form").hide();
