@@ -19,9 +19,9 @@
                     //判斷是否有帶電影的id，有的話則需選中該電影，沒有的話則照資料表撈出的順序來顯示電影列表
                     if(!empty($_GET['id'])){
                         $selected=($_GET['id']==$row['id'])?"selected":"";
-                        echo "<option value='".$row['id']."' $selected>".$row['name']."</option>";
+                        echo "<option value='".$row['id']."' data-name=".$row['name']." $selected>".$row['name']."</option>";
                     }else{
-                        echo "<option value='".$row['id']."'>".$row['name']."</option>";
+                        echo "<option value='".$row['id']."'  data-name=".$row['name'].">".$row['name']."</option>";
                     }
                 }
             ?>
@@ -47,6 +47,7 @@
     height:320px;
     display:flex;
     flex-wrap:wrap;
+    margin:auto;
 }
 
 .room > div{
@@ -54,6 +55,7 @@
     height:80px;
     position:relative;
     background:green;
+
 }
 .room > div:nth-child(odd){
     background:blue;
@@ -75,8 +77,15 @@
             ?>
         
         </div>
-
+<div class="info-block">
+<div class="info">
+     <p id="infoMovie">您選擇的電影是：<span id="movie-name"></span></p>           
+     <p id="infoSession">您選擇的時刻是：<span id="movie-date"></span> <span id="movie-session"></span></p>           
+     <p>您已經勾選<span id='ticket'></span>張票，最多可以購買四張票</p>           
+</div>
 <button onclick="prev()">上一步</button>
+<button onclick="order()">訂購</button>
+</div>
 </div>
 <script>
 //先執行一次取得電影上映期間的函式
@@ -93,6 +102,15 @@ $("#date").on("change",function(){
 })
 //挑選座位函式
 function booking(){
+    let movie=$("#movie").val();
+    let movieName=$("#movie option:selected").data("name")
+    let date=$("#date").val();
+    let session=$("#session").val();
+    let sessionName=$("#session option:selected").data("session");
+    
+    $("#movie-name").html(movieName);
+    $("#movie-date").html(date)
+    $("#movie-session").html(sessionName);
     $(".order-form").hide();
     $(".booking-form").show();
 }

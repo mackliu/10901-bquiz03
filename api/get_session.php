@@ -28,12 +28,12 @@ if(strtotime($movie_date)==$today){
 
     //從下一場開始列出可以訂票的場次
     for($i=($now+1);$i<=5;$i++){
-        echo "<option value='$i'>".$sess[$i]."</option>";
+        echo "<option value='$i' data-session='".$sess[$i]."'>".$sess[$i]."</option>";
     }
 }else{
     //如果選擇的日期不是今天，則五個場次都列出
     for($i=1;$i<=5;$i++){
-        echo "<option value='$i'>".$sess[$i]."</option>";
+        echo "<option value='$i' data-session='".$sess[$i]."'>".$sess[$i]."</option>";
     }
 }
 
