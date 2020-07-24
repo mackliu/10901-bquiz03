@@ -54,29 +54,26 @@
     width:64px;
     height:80px;
     position:relative;
-    background:green;
 
 }
-.room > div:nth-child(odd){
-    background:blue;
+
+.chkbox{
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+
+.null{
+    background:url("icon/03D02.png") no-repeat center;
+}
+.booked{
+    background:url("icon/03D03.png") no-repeat center;
 }
 </style>
 
 <div class="booking-form" style="display:none">
+    <div class="room"></div>
 
-        <div class="room">
-            <?php
-                for($i=0;$i<20;$i++){
-                    echo "<div>";
-                    echo floor($i/5)+1;
-                    echo "排";
-                    echo $i%5+1;
-                    echo "號";
-                    echo "</div>";
-                }
-            ?>
-        
-        </div>
 <div class="info-block">
 <div class="info">
      <p id="infoMovie">您選擇的電影是：<span id="movie-name"></span></p>           
@@ -100,6 +97,11 @@ $("#movie").on("change",function(){
 $("#date").on("change",function(){
     getSession();
 })
+
+
+
+
+
 //挑選座位函式
 function booking(){
     let movie=$("#movie").val();
@@ -107,10 +109,20 @@ function booking(){
     let date=$("#date").val();
     let session=$("#session").val();
     let sessionName=$("#session option:selected").data("session");
-    
+    let ticket=0;
     $("#movie-name").html(movieName);
     $("#movie-date").html(date)
     $("#movie-session").html(sessionName);
+
+    $.get("api/get_seats.php",function(seats){
+        $(".room").html(seats);
+        $(".chkbox").on("change",function(){
+        ticket++;
+        $("#ticket").html(ticket);
+})
+
+    })
+
     $(".order-form").hide();
     $(".booking-form").show();
 }
@@ -118,6 +130,7 @@ function booking(){
 function prev(){
     $(".order-form").show();
     $(".booking-form").hide();
+    $(".room").html("");
 }
 
 
