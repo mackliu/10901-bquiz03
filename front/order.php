@@ -48,12 +48,14 @@
     display:flex;
     flex-wrap:wrap;
     margin:auto;
+    padding-top:19px
 }
 
 .room > div{
     width:64px;
-    height:80px;
+    height:85px;
     position:relative;
+    text-align:center;
 
 }
 
@@ -69,10 +71,25 @@
 .booked{
     background:url("icon/03D03.png") no-repeat center;
 }
+.board{
+    width:540px;
+    height:370px;
+    margin:auto;
+    background:url("icon/03D04.png") no-repeat center;
+}
+.info-block{
+    background:#eee;
+    padding:10px 0 10px 300px;
+}
+.info p{
+    margin:5px;
+}
 </style>
 
 <div class="booking-form" style="display:none">
-    <div class="room"></div>
+    <div class="board">
+        <div class="room"></div>
+    </div>
 
 <div class="info-block">
 <div class="info">
