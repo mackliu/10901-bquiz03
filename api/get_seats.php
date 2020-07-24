@@ -1,11 +1,14 @@
 <?php
 include_once "../base.php";
 
-$db=new DB("ord");
+    $db=new DB("ord");
+
+    //取得ajax傳來的資料
     $movie=$_GET['movieName'];
     $date=$_GET['date'];
     $session=$_GET['sessionName'];
 
+    //取得符合條件的訂單資料
     $ords=$db->all([
         "movie"=>$movie,
         "date"=>$date,
@@ -14,11 +17,15 @@ $db=new DB("ord");
 
     $seat=[];
 
+    //將訂單的座位資料合併成一個陣列
     foreach($ords as $ord){
         $seat=array_merge($seat,unserialize($ord['seat']));
     }
-   /*  print_r($seat); */
+   
+    //使用迴圈來劃20個座位
     for($i=0;$i<20;$i++){
+
+        //用判斷式來決定座位是否被訂走，並顯示對應的class
         if(in_array($i,$seat)){
             echo "<div class='booked'>";
         }else{

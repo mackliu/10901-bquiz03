@@ -42,6 +42,7 @@
 </div>
 
 <style>
+/*建立劃位需要的css*/
 .room{
     width:320px;
     height:320px;
@@ -115,35 +116,44 @@ $("#date").on("change",function(){
     getSession();
 })
 
-
-
-
-
 //挑選座位函式
 function booking(){
+    //取得各項需要的資訊內容
     let movie=$("#movie").val();
     let movieName=$("#movie option:selected").data("name")
     let date=$("#date").val();
     let session=$("#session").val();
     let sessionName=$("#session option:selected").data("session");
     let ticket=0;
+    
+    //建立一個陣列用來儲存選中的座位
     let seat=new Array();
+
+    //將選單的內容寫入到劃位畫面的相關位置中
     $("#movie-name").html(movieName);
     $("#movie-date").html(date)
     $("#movie-session").html(sessionName);
 
+    //使用ajax來取得劃位的內容
     $.get("api/get_seats.php",{movieName,date,sessionName},function(seats){
         $(".room").html(seats);
+
+        //註冊劃位的選擇事件
         $(".chkbox").on("change",function(){
+
+            //取得checkbox的狀態並進行判斷
             let chk=$(this).prop('checked')
             switch(chk){
                 case true:
                     ticket++;
                     if(ticket>4){
                         /* alert("最多只能選四張票") */
+                        //還原票數及選擇狀態
                         ticket--;
                         $(this).prop("checked",false)
                     }else{
+
+                        //將座位放入陣列中並改變畫面中的座位底圖
                         seat.push($(this).val())
                         $(this).parent().removeClass("null")
                         $(this).parent().addClass("booked")
@@ -152,17 +162,23 @@ function booking(){
                 break;
                 case false:
                     ticket--;
+                    //從陣列中移除座位並改變畫面的座位底圖
                     seat.splice(seat.indexOf($(this).val()),1);
                         $(this).parent().removeClass("booked")
                         $(this).parent().addClass("null")
                 break;
             }
-            console.log(seat)
+            
          $("#ticket").html(ticket);
         })
     
+        //註冊送出訂單的按鈕事件
         $("#send").on("click",function(){
+
+            //使用ajax的方式送出訂單的內容，並取得訂單的編號
             $.post("api/order.php",{movie,date,session,seat},function(ordno){
+
+                //將頁面導向結果頁並帶上訂單編號
                 location.href="?do=result&ord="+ordno;
             })
         })
@@ -171,6 +187,7 @@ function booking(){
     $(".order-form").hide();
     $(".booking-form").show();
 }
+
 //上一步
 function prev(){
     $(".order-form").show();

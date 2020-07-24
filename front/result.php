@@ -1,14 +1,16 @@
 <?php
 
+//取得訂單編號
 $sno=$_GET['ord'];
 $db=new DB("ord");
+
+//取得訂單資料
 $ord=$db->find(['no'=>$sno]);
 
 ?>
 <table>
     <tr>
         <td colspan="2">感謝您的訂購，您的訂單編號是：<?=$ord['no'];?></td>
-
     </tr>
     <tr>
         <td>電影名稱:</td>
@@ -26,6 +28,7 @@ $ord=$db->find(['no'=>$sno]);
         <td colspan="2">
         座位:<br>
         <?php
+            //還原座位資料為陣列並顯示為排及號
            $seat=unserialize($ord['seat']);
            foreach($seat as $s){
                echo floor($s/5)+1;

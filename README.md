@@ -443,6 +443,17 @@ input[type='button'],input[type='submit'],input[type='reset'],button,.button
     }
 
 ```
+```php
+
+   //判斷是否有帶電影的id，有的話則需選中該電影，沒有的話則照資料表撈出的順序來顯示電影列表
+   if(!empty($_GET['id'])){
+       $selected=($_GET['id']==$row['id'])?"selected":"";
+       echo "<option value='".$row['id']."' data-name=".$row['name']." $selected>".$row['name']."</option>";
+   }else{
+       echo "<option value='".$row['id']."'  data-name=".$row['name'].">".$row['name']."</option>";
+   }
+
+```
 
 5. 在訂單頁面被載入時，要先執行一次 `getMovie()` 函式來建立電影選單，此時如果網址沒有帶 **id** 參數，則是依照資料庫取出的電影順序列出，如果網址中有帶 **id** 參數，則選單會將指定的電影設為選中的狀態，最後要記在電影選單以ajax的方式載入後，重建一下 **變數id** 的值，如果原本 **變數id** 是0，則在電影選單載入後，應取得第一筆 **電影的id值** 做為 **變數id** 的值，如果id已經被指定值，則不用做任何更改，因為我們接下來會把這個值帶去給下一個取得日期的函式使用，達到連動選單的效果。
 6. 在 `./api/`目錄中分別建立 `get_movie.php`,`get_duration.php`,`get_session.php` 三支API，這三支API會根據前端傳遞過來的參數進行資料的取得及處理，然後分別回傳 **電影列表** , **可訂票日期** , **可選場次** 選單給前端使用。
@@ -453,19 +464,19 @@ input[type='button'],input[type='submit'],input[type='reset'],button,.button
 
 $("#movie").on("change",function(){
     //取得選項的值，然後傳給getDate()
-    
 })
 
 $("#date").on("change",function(){
     //取得選項的值，然後傳給getSession()
 })
 
-$("#send").on("click",function(){
-    //取得三個選單的值，準備載入劃位畫面
-})
+function booking(){
+  //選完電影,日期,場次，準備載入劃位畫面
+
+}
 
 ```
-9. 為了方便可以隨時取得表單的值，我們另外寫一個函式來取得表單的內容，這個函式使用到了javascript的物件特性，讓我們可以用較簡便的方式來取得各個下拉選單，甚至整個表單的內容
+9. 為了方便可以隨時取得表單的值，我們開以另外寫一個函式來取得表單的內容，這個函式使用到了javascript的物件特性，讓我們可以用較簡便的方式來取得各個下拉選單，甚至整個表單的內容
 
 ```javascript
 
@@ -511,15 +522,48 @@ date_default_timezone_set("Asia/Taipei");
 
 由於題目有要求做出上一步回選單並保留選項的功能，因此我們採用ajax的方式來載入劃位的資料，而選單則使用控制顯示及隱藏來達到保留狀態的目的。
 
-1. 在 `./front/order.php` 中加入一個 **div** ，我們會使用jQuery的 `$().load()` 函式來分別載入劃位功能及最後的訂票結果。
-2. 在　`./front/` 目錄中建立 `booking.php` 檔，這個檔案會根據傳送過來的 **電影id** ， **日期** 及 **場次** 資料來生成劃位的畫面及需要的javascript程式碼
-3. 在使用者按下訂票選單中的確定按鈕後，我們使用ajax的方式傳送訂票的資料到 `./front/booking.php` ，然後載入符合訂票資料所需的場次劃位畫面，
-4. 在 `./front/booking.php` 中撰寫生成畫面元素的程式碼，這邊我們主要是利用css來達到排出座位表的功能，也可以考慮使用表格的方式來呈現。
+1. 在 `./front/order.php` 中加入一個 **div** ，我們會使用ajax來載入劃位畫面。
+2. 在　`./api/` 目錄中建立 `get_seats.php` 檔，這個檔案會根據傳送過來的 **電影id** ， **日期** 及 **場次** 資料來生成劃位的畫面
+3. 在使用者按下訂票選單中的確定按鈕後，我們使用ajax的方式傳送訂票的資料到 `./api/get_seats.php` ，然後載入符合訂票資料所需的場次劃位畫面，
+4. 在 `./api/get_seats.php` 中撰寫生成畫面元素的程式碼，這邊我們主要是利用css來達到排出座位表的功能，也可以考慮使用表格的方式來呈現。
 5. 撰寫判斷座位是否已訂位的程式，這邊我們要先從資料表中去撈出該場次己經被訂走的座位，然後在產生座位表時，逐一檢查每個座位是否開放訂票。
+
+```php
+
+    $db=new DB("ord");
+    //取得ajax傳來的資料
+    $movie=$_GET['movieName'];
+    $date=$_GET['date'];
+    $session=$_GET['sessionName'];
+
+    //取得符合條件的訂單資料
+    $ords=$db->all([
+        "movie"=>$movie,
+        "date"=>$date,
+        "session"=>$session
+    ]);
+
+    $seat=[];
+
+    //將訂單的座位資料合併成一個陣列
+    foreach($ords as $ord){
+        $seat=array_merge($seat,unserialize($ord['seat']));
+    }
+
+    //用判斷式來決定座位是否被訂走，並顯示對應的class
+    if(in_array($i,$seat)){
+        echo "<div class='booked'>";
+    }else{
+        echo "<div class='null'>";
+        echo "<input type='checkbox' name='num[]' value='".$i."class='chkbox'>";
+    }
+
+```
 6. 撰寫js來進行劃位操作的檢查，這邊要注意使用者的操作行為可以劃位也可以取消，因此兩種狀況都要考慮進去。
 7. 撰寫上一步的按鈕功能，這邊我們採用顯示／隱藏的方式來處理表單，即可做到保留選取狀態的功能，而清空劃區塊的內容則可以做到清除劃位的各項變數及劃位的狀況。
+8. 撰寫送出訂單儲存的功能，會先用 **$.post()**的方式將訂單資料傳送給 **api/order.php**處理，然後回傳拿到訂單編號，再使用**location.href**的方式將畫面導向訂購結果頁。
 8. 在 `./front/` 目錄中建立 `result.php` 檔案。
-9. 在 `result.php` 中撰寫訂票結果頁，這邊一樣採用 jQuery的 `$().load()` 的方式來載入 `result.php` 頁面，然後在執行 **load()** 時，我們也同時把劃位時的座位及電影場次資訊一併傳給 `result.php` 。
+9. 在 `result.php` 中撰寫訂票結果頁，這邊會在網址中傳入訂單編號，據此可以取得訂單結果。
 10. 電影票訂單的示意圖中有一顆 **確認** 的按鈕，但題目中沒有說明這個按鈕按了之後要去那裏，我是讓這顆按鈕按了之後會回到首頁，但不做任何功能應該也是沒關係的。 
 
 ---
