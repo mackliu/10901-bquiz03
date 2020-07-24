@@ -110,6 +110,7 @@ function booking(){
     let session=$("#session").val();
     let sessionName=$("#session option:selected").data("session");
     let ticket=0;
+    let seat=new Array();
     $("#movie-name").html(movieName);
     $("#movie-date").html(date)
     $("#movie-session").html(sessionName);
@@ -117,7 +118,24 @@ function booking(){
     $.get("api/get_seats.php",function(seats){
         $(".room").html(seats);
         $(".chkbox").on("change",function(){
-        ticket++;
+            let chk=$(this).prop('checked')
+            switch(chk){
+                case true:
+                    ticket++;
+                    if(ticket>4){
+                        /* alert("最多只能選四張票") */
+                        ticket--;
+                        $(this).prop("checked",false)
+                    }else{
+                        seat.push($(this).val())
+                    }
+                break;
+                case false:
+                    ticket--;
+                    seat.splice(seat.indexOf($(this).val()),1);
+                break;
+            }
+            console.log(seat)
         $("#ticket").html(ticket);
 })
 
