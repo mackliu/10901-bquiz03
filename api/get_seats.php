@@ -1,6 +1,18 @@
 <?php
 include_once "../base.php";
 
+$db=new DB("ord");
+    $movie=$_GET['movieName'];
+    $date=$_GET['date'];
+    $session=$_GET['sessionName'];
+
+    $ords=$db->all([
+        "movie"=>$movie,
+        "date"=>$date,
+        "session"=>$session
+    ]);
+
+    print_r($ords);
 
     for($i=0;$i<20;$i++){
         echo "<div class='null'>";

@@ -115,7 +115,7 @@ function booking(){
     $("#movie-date").html(date)
     $("#movie-session").html(sessionName);
 
-    $.get("api/get_seats.php",function(seats){
+    $.get("api/get_seats.php",{movieName,date,sessionName},function(seats){
         $(".room").html(seats);
         $(".chkbox").on("change",function(){
             let chk=$(this).prop('checked')
