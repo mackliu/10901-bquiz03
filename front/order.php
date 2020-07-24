@@ -141,7 +141,6 @@ function booking(){
     
         $("#send").on("click",function(){
             $.post("api/order.php",{movie,date,session,seat},function(ordno){
-                
                 location.href="?do=result&ord="+ordno;
             })
         })

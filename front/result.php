@@ -26,7 +26,16 @@ $ord=$db->find(['no'=>$sno]);
         <td colspan="2">
         座位:<br>
         <?php
-           echo  $ord['seat'];
+           $seat=unserialize($ord['seat']);
+           foreach($seat as $s){
+               echo floor($s/5)+1;
+               echo "排";
+               echo $s%5+1;
+               echo "號";
+               echo "<br>";
+           }
+
+           echo "共".$ord['qt']."張電影票";
         ?>
         </td>
 
