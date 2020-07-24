@@ -42,7 +42,7 @@ $ord=$db->find(['no'=>$sno]);
     </tr>
     <tr>
         <td colspan="2">
-            <button onclick="location.hrf='index.php'">確認</button>
+            <button onclick="location.href='index.php'">確認</button>
         </td>
     </tr>
 </table>

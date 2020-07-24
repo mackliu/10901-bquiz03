@@ -12,15 +12,23 @@ $db=new DB("ord");
         "session"=>$session
     ]);
 
-    print_r($ords);
+    $seat=[];
 
+    foreach($ords as $ord){
+        $seat=array_merge($seat,unserialize($ord['seat']));
+    }
+   /*  print_r($seat); */
     for($i=0;$i<20;$i++){
-        echo "<div class='null'>";
+        if(in_array($i,$seat)){
+            echo "<div class='booked'>";
+        }else{
+            echo "<div class='null'>";
+            echo "<input type='checkbox' name='num[]' value='".$i."' class='chkbox'>";
+        }
         echo floor($i/5)+1;
         echo "排";
         echo $i%5+1;
         echo "號";
-        echo "<input type='checkbox' name='num[]' value='".$i."' class='chkbox'>";
         echo "</div>";
     }
 

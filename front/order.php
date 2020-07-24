@@ -128,11 +128,16 @@ function booking(){
                         $(this).prop("checked",false)
                     }else{
                         seat.push($(this).val())
+                        $(this).parent().removeClass("null")
+                        $(this).parent().addClass("booked")
+
                     }
                 break;
                 case false:
                     ticket--;
                     seat.splice(seat.indexOf($(this).val()),1);
+                        $(this).parent().removeClass("booked")
+                        $(this).parent().addClass("null")
                 break;
             }
             console.log(seat)
