@@ -63,7 +63,7 @@ foreach($orders as $ord){
     
     ?>
     </li>
-    <li><button>刪除</button></li>
+    <li><button onclick="del('ord',<?=$ord['id'];?>)">刪除</button></li>
 </ul>
 <hr>
 <?php
@@ -72,3 +72,15 @@ foreach($orders as $ord){
 </div>
 
 </div>
+
+<script>
+//刪除資料表資料的函式
+function del(table,id){
+    if(confirm("你確定要刪除該筆資料嗎?")){
+        $.post("api/del.php",{table,id},function(){
+            location.reload();
+        })
+    }
+}
+
+</script>
