@@ -90,8 +90,18 @@ $rows=$po->all(['sh'=>1]," order by `rank`");
 
         </div>
       </div>
+      <button type="button" id="onToday">所有電影今天上映！</button>
     </div>
-      <script>
+
+<script>
+   //把資料庫中的電影上映日期全改為今天，以用於資料展示
+$("#onToday").on("click",function(){
+    $.get("api/on_today.php",function(){
+        alert("通通上演啦！");
+        location.reload();
+    })
+})
+    
       //先顯示第一張預告片海報
       $(".po").eq(0).show();
 
