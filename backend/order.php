@@ -7,6 +7,7 @@
 依電影
 <select name="movie" id="movie">
 <?php
+//利用group by來取得訂單資料表中的電影做為選單
 $mlist=$Ord->all([]," group by `movie`");
 foreach($mlist as $m){
     echo "<option value='".$m['movie']."'>".$m['movie']."</option>";
@@ -41,6 +42,8 @@ width:14%;
 </ul>
 <div style="overflow:auto;height:400px">
 <?php
+
+//取得全部的訂單，並依編號排序
 $orders=$Ord->all([]," order by no desc");
 
 foreach($orders as $ord){
@@ -53,6 +56,7 @@ foreach($orders as $ord){
     <li><?=$ord['session'];?></li>
     <li><?=$ord['qt'];?></li>
     <li><?php
+        //將座位資料還原為陣列後再計算出對應的排及號
         $seat=unserialize($ord['seat']);
         foreach($seat as $s){
             echo floor($s/5)+1;
@@ -83,9 +87,13 @@ function del(table,id){
     }
 }
 
+//快速刪除的函式
 function qDel(){
+    //取得目前選擇的快速刪除項目
     let type=$("input[name='type']:checked").val()
     let option="";
+
+    //依據要刪除的項目來取得對應的欄位內容
     switch(type){
         case 'date':
             option=$("#date").val()
@@ -96,6 +104,7 @@ function qDel(){
         break;
     }
 
+    //先進行確認的動作，再用ajax的方式傳送要刪除的內容
     if(confirm("你確定要刪除"+option+"的所有訂單嗎?")){
         $.post('api/qdel.php',{type,option},function(){
                     location.reload()
