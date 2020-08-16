@@ -1,6 +1,7 @@
 # 題組三解題步驟
 #### 解題參考影片
 * **[影片列表](https://www.youtube.com/watch?v=D0dNfqAEW5M&list=PLL26U2k-yzXviV6pyMZ6aaisxELvyTs6-)**
+* **[解題影片程式碼](https://github.com/mackliu/10901-bquiz03-v)**
 
 
 ## 步驟一：將素材目錄複製到崗位目錄下，確認素材內容與抽題題號一致
